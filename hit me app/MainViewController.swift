@@ -19,6 +19,7 @@ class ViewController: UIViewController {
     var absDiff : Int = 0
     var scoreRightNow : Int = 0
     
+    
     // outlets
     @IBOutlet weak var randomNumberGuess: UILabel!
     @IBOutlet weak var slider: UISlider!
@@ -45,6 +46,22 @@ class ViewController: UIViewController {
         getTheDiff()
 
         scoring()
+        
+        let thumbImageNormal = #imageLiteral(resourceName: "SliderThumb-Normal")
+        slider.setThumbImage(thumbImageNormal, for: .normal)
+        
+        let thumbImageHighlighted = #imageLiteral(resourceName: "SliderThumb-Highlighted")
+        slider.setThumbImage(thumbImageHighlighted, for: .normal)
+        
+        let insets = UIEdgeInsets(top: 0, left: 14, bottom: 0, right: 14)
+        
+        let trackLeftImage = #imageLiteral(resourceName: "SliderTrackLeft")
+        let trackLeftResizable = trackLeftImage.resizableImage(withCapInsets: insets)
+        slider.setMinimumTrackImage(trackLeftResizable, for: .normal)
+        
+        let trackRightimage = #imageLiteral(resourceName: "SliderTrackRight")
+        let trackRightResizable = trackRightimage.resizableImage(withCapInsets: insets)
+        slider.setMaximumTrackImage(trackRightResizable, for: .normal)
         
     }
     
