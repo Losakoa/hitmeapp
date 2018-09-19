@@ -11,14 +11,11 @@ import UIKit
 class ViewController: UIViewController {
     
     // vars
-    var targetValue : Int = 0
-    var sliderValue : Int = 50
-    var difference : Int = 0
-    var round : Int = 0
-    var score : Int = 0
-    var absDiff : Int = 0
-    var scoreRightNow : Int = 0
-    
+    var targetValue = 0
+    var currentValue = 0
+    var difference = 0
+    var round = 0
+    var score = 0
     
     // outlets
     @IBOutlet weak var randomNumberGuess: UILabel!
@@ -34,19 +31,124 @@ class ViewController: UIViewController {
     override func viewDidLoad() {
         
         super.viewDidLoad()
-        // Do any additional setup after loading the view, typically from a nib.
-        randomNumberToGuess()
         
-        // initialize an initial slider value when the screen loads
+        // set the
+        let roundedValue = slider.value.rounded()
+        currentValue = Int(roundedValue)
+        startNewRound()
+        
+    }
+    
+    
+    
+    
+    
+    
+
+    // This is the hit me button
+    @IBAction func alertUser(_ sender: UIButton) {
+        
+        alertPopup()
+        
+    }
+    
+    // this is the alert popup for the hit me button
+    func alertPopup () {
+        
+        let difference = abs(targetValue - currentValue)
+        var points = 100 - difference
+        
+        score += points
+        
+        let title : String
+        if difference == 0 {
+            title = "perfect"
+            points += 100
+        } else if difference < 5 {
+            title = "You almost had it"
+            points += 50
+        } else if difference < 10 {
+            title = "Pretty good."
+        } else {
+            title = "Way off!"
+        }
+        
+        setSliderColors()
+        
+        let message = "Slider Value: \(currentValue)" +
+        "\nThe actual value is: \(targetValue)" +
+        "\nA difference of: \(difference)" +
+        "\nPoints: \(points)"
+        
+        // setting alert up for the alertUser button
+        let alert = UIAlertController(title: title, message: message, preferredStyle: .alert)
+        
+        // sets up the button associated with alert
+        let alertButtonAction = UIAlertAction(title: "OK", style: .default, handler: {
+            action in
+            self.startNewRound()
+        })
+        
+        alert.addAction(alertButtonAction)
+        
+        present(alert, animated: true, completion: nil)
+        
+    }
+    
+    // slider when slid - 0 to 100 and rounded
+    @IBAction func sliderMoved(_ slider: UISlider) {
+        
         initSlider()
         
-        // currentRoundLabel.text = "\(round)"
-        increaseRounds()
+    }
+    
+    
+    @IBAction func restartGamePressed(_ sender: UIButton) {
         
-        getTheDiff()
+        restartTheGame()
+        
+    }
+    
+    
+    
+    
+    
+    // function to initialize the slider
+    func initSlider () {
+        
+        let roundedValue = slider.value.rounded()
+        currentValue = Int(roundedValue)
+        
+    }
+    
+    // generate a random num func
+    func randomNumberToGuess() {
 
-        scoring()
+        targetValue = Int.random(in: 1...100)
+
+    }
+    
+    
+    
+
+    
+    // if the slider is less than the target value
+    // then the difference is target value minus slider value
+    // if the slider is greater than the target value
+    // then the difference is slider value minus target value
+    
+    
+    func restartTheGame () {
         
+        round = 0
+        score = 0
+        let roundedValue = slider.value.rounded()
+        currentValue = Int(roundedValue)
+        startNewRound()
+    }
+    
+    
+    func setSliderColors () {
         let thumbImageNormal = #imageLiteral(resourceName: "SliderThumb-Normal")
         slider.setThumbImage(thumbImageNormal, for: .normal)
         
@@ -62,145 +164,25 @@ class ViewController: UIViewController {
         let trackRightimage = #imageLiteral(resourceName: "SliderTrackRight")
         let trackRightResizable = trackRightimage.resizableImage(withCapInsets: insets)
         slider.setMaximumTrackImage(trackRightResizable, for: .normal)
-        
     }
     
-    
-    
-    
-    
-    
-
-    // This is the hit me button
-    @IBAction func alertUser(_ sender: UIButton) {
-        
-        alertPopup()
-        increaseRounds()
-        getTheDiff()
-        scoring()
-        
-    }
-    
-    // this is the alert popup for the hit me button
-    func alertPopup () {
-        
-        let message = "Slider Value: \(sliderValue)" +
-        "\nThe actual value is: \(targetValue)" +
-        "\nA difference of: \(difference)" +
-        "\nPoints: \(scoreRightNow)"
-        
-        // setting alert up for the alertUser button
-        let alert = UIAlertController(title: "Your guess", message: message, preferredStyle: .alert)
-        
-        // sets up the button associated with alert
-        let alertButtonAction = UIAlertAction(title: "Awesome", style: .default, handler: nil)
-        
-        alert.addAction(alertButtonAction)
-        
-        present(alert, animated: true, completion: nil)
-        
-    }
-    
-    // slider when slid - 0 to 100 and rounded
-    @IBAction func sliderMoved(_ slider: UISlider) {
-        initSlider()
-    }
-    
-    
-    @IBAction func restartGamePressed(_ sender: UIButton) {
-        restartTheGame()
-    }
-    
-    
-    
-    
-    
-    // generate a random num func
-    func randomNumberToGuess() {
-        // generate random number
-        targetValue = Int.random(in: 1...100)
-        
-        // update the UI Label with random number
-        randomNumberGuess.text = String(targetValue)
-    }
-    
-    // function to initialize the slider
-    func initSlider () {
-        let roundedValue = slider.value.rounded()
-        sliderValue = Int(roundedValue)
-    }
     
     // increase round function
-    func increaseRounds () {
+    func startNewRound () {
         
-        randomNumberToGuess()
-        sliderValue = 50
-        slider.value = Float(sliderValue)
         round += 1
-        currentRoundLabel.text = "\(round)"
+        randomNumberToGuess()
+        currentValue = 50
+        slider.value = Float(currentValue)
+        updateLabels()
         
     }
     
-    // if the slider is less than the target value
-    // then the difference is target value minus slider value
-    // if the slider is greater than the target value
-    // then the difference is slider value minus target value
-    
-    func getTheDiff () {
-        
-        difference = targetValue - sliderValue
-        if difference < 0 {
-            difference = abs(difference)
-        }
-        
-    }
-    
-    func restartTheGame () {
-        
-        round = 0
-        score = 0
-        increaseRounds()
-        
-    }
-    
-    func scoring () {
-        
-        scoreView.text = "\(score)"
-        
-        switch difference {
-        
-        case 0 ..< 10:
-            score += 200
-            scoreRightNow = 200
-        case 10 ..< 20:
-            score += 180
-            scoreRightNow = 180
-        case 30 ..< 40:
-            score += 160
-            scoreRightNow = 160
-        case 40 ..< 50:
-            score += 140
-            scoreRightNow = 140
-        case 50 ..< 60:
-            score += 120
-            scoreRightNow = 120
-        case 60 ..< 70:
-            score += 100
-            scoreRightNow = 100
-        case 70 ..< 80:
-            score += 80
-            scoreRightNow = 80
-        case 80 ..< 90:
-            score += 60
-            scoreRightNow = 60
-        case 90 ... 100:
-            score += 40
-            scoreRightNow = 40
-        default:
-            score += 20
-            scoreRightNow = 20
-            
-        }
+    func updateLabels () {
+
+        randomNumberGuess.text = String(targetValue)
+        scoreView.text = String(score)
+        currentRoundLabel.text = String(round)
         
     }
     
